@@ -2,10 +2,16 @@ from huggingface import evaluate as evaluater
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
-path = "data/train_en_500.csv"
+en = True
+addition = ""
+if en:
+    addition = "_en"
+
+
+path = "data/train" + addition + "_500.csv"
 # used between splits to save data to be loaded by evaluation function
-train_path = "data/train_temp.csv"
-test_path = "data/test_temp.csv"
+train_path = "data/train" + addition + "_temp.csv"
+test_path = "data/test" + addition + "_temp.csv"
 data = pd.read_csv(path)
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 split = skf.split(data, data.label)

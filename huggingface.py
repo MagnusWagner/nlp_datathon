@@ -2,14 +2,14 @@ from datasets import load_dataset, load_metric
 import datasets
 import random
 import pandas as pd
-from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer, GPT2Tokenizer
+from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AutoTokenizer
 import numpy as np
 
 # def evaluate(train_path, test_path):
 train_path = "data/train_en_500.csv"
 test_path = "data/train_en_100.csv"
 
-model_checkpoint = "roberta-base" # "distilbert-base-uncased"
+model_checkpoint = "gpt2" # "distilbert-base-uncased"
 batch_size = 1
 dataset = load_dataset('csv', data_files={"train": train_path, "validation": test_path})
 metric = load_metric("accuracy")
@@ -40,6 +40,8 @@ metric.compute(predictions=fake_preds, references=fake_labels)
 
 
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint, use_fast=True)
+# for gpt2:
+tokenizer.pad_token = tokenizer.eos_token
 sentence1_key = "Narrative"
 
 def preprocess_function(examples):
@@ -72,6 +74,7 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(predictions, axis=1)
     return metric.compute(predictions=predictions, references=labels)
 
+model.is_parallelizable = False
 trainer = Trainer(
     model,
     args,
